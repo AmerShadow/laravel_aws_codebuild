@@ -4,17 +4,17 @@ phases:
   pre_build:
     commands:
       - echo Logging into Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin arn:aws:ecr:us-east-1:058264125836:repository/prod_laravel_aws_codebuild:latest
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 058264125836.dkr.ecr.us-east-1.amazonaws.com/prod_laravel_aws_codebuild
       - echo Pulling dependencies...
       - docker build -t laravel-app .
-      - docker tag laravel-app:latest arn:aws:ecr:us-east-1:058264125836:repository/prod_laravel_aws_codebuild:latest
+      - docker tag laravel-app:latest 058264125836.dkr.ecr.us-east-1.amazonaws.com/prod_laravel_aws_codebuild:latest
   build:
     commands:
       - echo Building the Docker image...
   post_build:
     commands:
       - echo Pushing Docker image to ECR...
-      - docker push arn:aws:ecr:us-east-1:058264125836:repository/prod_laravel_aws_codebuild:latest
+      - docker push 058264125836.dkr.ecr.us-east-1.amazonaws.com/prod_laravel_aws_codebuild:latest
 artifacts:
   files:
     - '**/*'
