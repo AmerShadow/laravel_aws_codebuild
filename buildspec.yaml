@@ -1,0 +1,28 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing PHP and Composer...
+      - yum install -y amazon-linux-extras
+      - amazon-linux-extras enable php7.4
+      - yum clean metadata
+      - yum install -y php php-zip php-mbstring
+      - curl -sS https://getcomposer.org/installer | php
+      - mv composer.phar /usr/local/bin/composer
+      - composer install --no-interaction --prefer-dist --optimize-autoloader
+  pre_build:
+    commands:
+      - echo Pre-Build steps...
+      - cp .env.example .env
+      - php artisan key:generate
+  build:
+    commands:
+      - echo Building the application...
+  post_build:
+    commands:
+      - echo Build completed
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: no
