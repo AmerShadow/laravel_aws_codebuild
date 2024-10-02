@@ -1,28 +1,21 @@
 version: 0.2
 
 phases:
-  install:
-    commands:
-      - echo Installing PHP and Composer...
-      - yum install -y amazon-linux-extras
-      - amazon-linux-extras enable php7.4
-      - yum clean metadata
-      - yum install -y php php-zip php-mbstring
-      - curl -sS https://getcomposer.org/installer | php
-      - mv composer.phar /usr/local/bin/composer
-      - composer install --no-interaction --prefer-dist --optimize-autoloader
   pre_build:
     commands:
-      - echo Pre-Build steps...
-      - cp .env.example .env
-      - php artisan key:generate
+      - echo Logging into Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin <your_ecr_uri>
+      - echo Pulling dependencies...
+      - docker build -t laravel-app .
+      - docker tag laravel-app:latest arn:aws:ecr:us-east-1:058264125836:repository/prod_laravel_aws_codebuild:latest
   build:
     commands:
-      - echo Building the application...
+      - echo Building the Docker image...
   post_build:
     commands:
-      - echo Build completed
+      - echo Pushing Docker image to ECR...
+      - docker push arn:aws:ecr:us-east-1:058264125836:repository/prod_laravel_aws_codebuild:latest
 artifacts:
   files:
     - '**/*'
-  discard-paths: no
+  discard-paths: yes
